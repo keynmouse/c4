@@ -1,0 +1,90 @@
+[0.142s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build']
+[0.142s] DEBUG:colcon:Parsed command line arguments: Namespace(log_base=None, log_level=None, verb_name='build', build_base='build', install_base='install', merge_install=False, symlink_install=False, test_result_base=None, continue_on_error=False, executor='parallel', parallel_workers=20, event_handlers=None, ignore_user_meta=False, metas=['./colcon.meta'], base_paths=['.'], packages_ignore=None, packages_ignore_regex=None, paths=None, packages_up_to=None, packages_up_to_regex=None, packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_select_by_dep=None, packages_skip_by_dep=None, packages_skip_up_to=None, packages_select_build_failed=False, packages_skip_build_finished=False, packages_select_test_failures=False, packages_skip_test_passed=False, packages_select=None, packages_skip=None, packages_select_regex=None, packages_skip_regex=None, packages_start=None, packages_end=None, allow_overriding=[], cmake_args=None, cmake_target=None, cmake_target_skip_unavailable=False, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, ament_cmake_args=None, catkin_cmake_args=None, catkin_skip_building_tests=False, verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x78b2065a8a00>, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x78b206778250>, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x78b206778250>>)
+[0.371s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.372s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.372s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.372s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.372s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.372s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.372s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/keynmouse/ws2/src'
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.372s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.387s] DEBUG:colcon.colcon_core.package_identification:Package '.' with type 'ros.ament_python' and name 'test3'
+[0.387s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.387s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.387s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.387s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.387s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.407s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) check parameters
+[0.407s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) discover
+[0.410s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 12 installed packages in /home/keynmouse/turtlebot3_ws/install
+[0.411s] DEBUG:colcon.colcon_installed_package_information.package_discovery:Found 334 installed packages in /opt/ros/humble
+[0.414s] Level 1:colcon.colcon_core.package_discovery:discover_packages(prefix_path) using defaults
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'cmake_args' from command line to 'None'
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'cmake_target' from command line to 'None'
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'cmake_clean_cache' from command line to 'False'
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'cmake_clean_first' from command line to 'False'
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'cmake_force_configure' from command line to 'False'
+[0.460s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'ament_cmake_args' from command line to 'None'
+[0.461s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'catkin_cmake_args' from command line to 'None'
+[0.461s] Level 5:colcon.colcon_core.verb:set package 'test3' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.461s] DEBUG:colcon.colcon_core.verb:Building package 'test3' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/keynmouse/ws2/src/build/test3', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/keynmouse/ws2/src/install/test3', 'merge_install': False, 'path': '/home/keynmouse/ws2/src', 'symlink_install': False, 'test_result_base': None}
+[0.461s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.462s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.462s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/keynmouse/ws2/src' with build type 'ament_python'
+[0.462s] Level 1:colcon.colcon_core.shell:create_environment_hook('test3', 'ament_prefix_path')
+[0.464s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.464s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/keynmouse/ws2/src/install/test3/share/test3/hook/ament_prefix_path.ps1'
+[0.465s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/keynmouse/ws2/src/install/test3/share/test3/hook/ament_prefix_path.dsv'
+[0.466s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/keynmouse/ws2/src/install/test3/share/test3/hook/ament_prefix_path.sh'
+[0.466s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.466s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.794s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/keynmouse/ws2/src'
+[0.794s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.794s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[1.215s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/keynmouse/ws2/src': PYTHONPATH=/home/keynmouse/ws2/src/build/test3/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/test3 build --build-base /home/keynmouse/ws2/src/build/test3/build install --record /home/keynmouse/ws2/src/build/test3/install.log --single-version-externally-managed install_data
+[1.569s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/keynmouse/ws2/src' returned '0': PYTHONPATH=/home/keynmouse/ws2/src/build/test3/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py egg_info --egg-base build/test3 build --build-base /home/keynmouse/ws2/src/build/test3/build install --record /home/keynmouse/ws2/src/build/test3/install.log --single-version-externally-managed install_data
+[1.571s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3' for CMake module files
+[1.571s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3' for CMake config files
+[1.572s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3/lib'
+[1.572s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3/bin'
+[1.572s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3/lib/pkgconfig/test3.pc'
+[1.573s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages'
+[1.573s] Level 1:colcon.colcon_core.shell:create_environment_hook('test3', 'pythonpath')
+[1.573s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/keynmouse/ws2/src/install/test3/share/test3/hook/pythonpath.ps1'
+[1.573s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/keynmouse/ws2/src/install/test3/share/test3/hook/pythonpath.dsv'
+[1.574s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/keynmouse/ws2/src/install/test3/share/test3/hook/pythonpath.sh'
+[1.574s] Level 1:colcon.colcon_core.environment:checking '/home/keynmouse/ws2/src/install/test3/bin'
+[1.574s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(test3)
+[1.575s] INFO:colcon.colcon_core.shell:Creating package script '/home/keynmouse/ws2/src/install/test3/share/test3/package.ps1'
+[1.575s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/keynmouse/ws2/src/install/test3/share/test3/package.dsv'
+[1.576s] INFO:colcon.colcon_core.shell:Creating package script '/home/keynmouse/ws2/src/install/test3/share/test3/package.sh'
+[1.577s] INFO:colcon.colcon_core.shell:Creating package script '/home/keynmouse/ws2/src/install/test3/share/test3/package.bash'
+[1.577s] INFO:colcon.colcon_core.shell:Creating package script '/home/keynmouse/ws2/src/install/test3/share/test3/package.zsh'
+[1.578s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/keynmouse/ws2/src/install/test3/share/colcon-core/packages/test3)
+[1.578s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.579s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.579s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.579s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.584s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[1.584s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[1.584s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[1.601s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.601s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/keynmouse/ws2/src/install/local_setup.ps1'
+[1.602s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/keynmouse/ws2/src/install/_local_setup_util_ps1.py'
+[1.603s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/keynmouse/ws2/src/install/setup.ps1'
+[1.605s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/keynmouse/ws2/src/install/local_setup.sh'
+[1.605s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/keynmouse/ws2/src/install/_local_setup_util_sh.py'
+[1.606s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/keynmouse/ws2/src/install/setup.sh'
+[1.608s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/keynmouse/ws2/src/install/local_setup.bash'
+[1.608s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/keynmouse/ws2/src/install/setup.bash'
+[1.610s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/keynmouse/ws2/src/install/local_setup.zsh'
+[1.610s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/keynmouse/ws2/src/install/setup.zsh'

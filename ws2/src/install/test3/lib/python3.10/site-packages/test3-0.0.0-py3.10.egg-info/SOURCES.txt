@@ -1,0 +1,15 @@
+package.xml
+setup.cfg
+setup.py
+build/test3/test3.egg-info/PKG-INFO
+build/test3/test3.egg-info/SOURCES.txt
+build/test3/test3.egg-info/dependency_links.txt
+build/test3/test3.egg-info/entry_points.txt
+build/test3/test3.egg-info/requires.txt
+build/test3/test3.egg-info/top_level.txt
+build/test3/test3.egg-info/zip-safe
+resource/test3
+srv/Order.srv
+test3/__init__.py
+test3/service_client6.py
+test3/service_server6.py
