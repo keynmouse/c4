@@ -1,0 +1,7 @@
+# Request
+NewOrder order
+---
+# Response
+bool success
+int32 order_id
+string message
