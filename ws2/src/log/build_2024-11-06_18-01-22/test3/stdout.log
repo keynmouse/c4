@@ -1,0 +1,41 @@
+running egg_info
+creating build/test3/test3.egg-info
+writing build/test3/test3.egg-info/PKG-INFO
+writing dependency_links to build/test3/test3.egg-info/dependency_links.txt
+writing entry points to build/test3/test3.egg-info/entry_points.txt
+writing requirements to build/test3/test3.egg-info/requires.txt
+writing top-level names to build/test3/test3.egg-info/top_level.txt
+writing manifest file 'build/test3/test3.egg-info/SOURCES.txt'
+reading manifest file 'build/test3/test3.egg-info/SOURCES.txt'
+writing manifest file 'build/test3/test3.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/keynmouse/ws2/src/build/test3/build
+creating /home/keynmouse/ws2/src/build/test3/build/lib
+creating /home/keynmouse/ws2/src/build/test3/build/lib/test3
+copying test3/service_client6.py -> /home/keynmouse/ws2/src/build/test3/build/lib/test3
+copying test3/service_server6.py -> /home/keynmouse/ws2/src/build/test3/build/lib/test3
+copying test3/__init__.py -> /home/keynmouse/ws2/src/build/test3/build/lib/test3
+running install
+running install_lib
+creating /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3
+copying /home/keynmouse/ws2/src/build/test3/build/lib/test3/service_client6.py -> /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3
+copying /home/keynmouse/ws2/src/build/test3/build/lib/test3/service_server6.py -> /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3
+copying /home/keynmouse/ws2/src/build/test3/build/lib/test3/__init__.py -> /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3
+byte-compiling /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3/service_client6.py to service_client6.cpython-310.pyc
+byte-compiling /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3/service_server6.py to service_server6.cpython-310.pyc
+byte-compiling /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3/__init__.py to __init__.cpython-310.pyc
+running install_data
+creating /home/keynmouse/ws2/src/install/test3/share/ament_index
+creating /home/keynmouse/ws2/src/install/test3/share/ament_index/resource_index
+creating /home/keynmouse/ws2/src/install/test3/share/ament_index/resource_index/packages
+copying resource/test3 -> /home/keynmouse/ws2/src/install/test3/share/ament_index/resource_index/packages
+copying package.xml -> /home/keynmouse/ws2/src/install/test3/share/test3
+creating /home/keynmouse/ws2/src/install/test3/share/test3/srv
+copying srv/Order.srv -> /home/keynmouse/ws2/src/install/test3/share/test3/srv
+running install_egg_info
+Copying build/test3/test3.egg-info to /home/keynmouse/ws2/src/install/test3/lib/python3.10/site-packages/test3-0.0.0-py3.10.egg-info
+running install_scripts
+Installing client script to /home/keynmouse/ws2/src/install/test3/lib/test3
+Installing server script to /home/keynmouse/ws2/src/install/test3/lib/test3
+writing list of installed files to '/home/keynmouse/ws2/src/build/test3/install.log'

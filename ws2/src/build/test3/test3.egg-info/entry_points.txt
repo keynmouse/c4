@@ -1,0 +1,4 @@
+[console_scripts]
+client = test3.service_client6:main
+server = test3.service_server6:main
+
