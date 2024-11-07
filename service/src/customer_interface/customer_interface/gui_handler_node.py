@@ -1,137 +1,3 @@
-# #!/usr/bin/env python3
-# import rclpy
-# from rclpy.node import Node
-# from order_interfaces.msg import NewOrder, CancelOrder, FoodOrder
-# from order_interfaces.srv import OrderService
-# from rclpy.callback_groups import ReentrantCallbackGroup
-# from builtin_interfaces.msg import Time
-# import datetime
-# import time
-
-# class RestaurantClient(Node):
-#     def __init__(self):
-#         super().__init__('restaurant_client')
-        
-#         callback_group = ReentrantCallbackGroup()
-        
-#         self.order_client = self.create_client(
-#             OrderService,
-#             'order_service',
-#             callback_group=callback_group)
-            
-#         self.cancel_publisher = self.create_publisher(
-#             CancelOrder,
-#             'cancel_order',
-#             10)
-            
-#         while not self.order_client.wait_for_service(timeout_sec=1.0):
-#             self.get_logger().info('서비스를 기다리는 중...')
-            
-#         self.get_logger().info('레스토랑 클라이언트가 준비되었습니다.')
-        
-#         # 주문 카운터 (order_id 생성용)
-#         self._order_counter = 1
-
-#     def send_order(self, table_id, food_orders):
-#         """
-#         주문을 보내는 메서드
-        
-#         Args:
-#             table_id (int): 테이블 번호
-#             food_orders (list): [(food_id, quantity), ...] 형태의 주문 목록
-#                 food_id (int): 음식 ID
-#                 quantity (int): 수량
-#         """
-#         # 새 주문 메시지 생성
-#         order = NewOrder()
-#         order.order_id = self._order_counter  # 순차적인 주문 번호 할당
-#         self._order_counter += 1
-#         order.table_id = table_id
-        
-#         # ROS2 Time 메시지 생성
-#         now = self.get_clock().now()
-#         order.order_time = Time(sec=int(now.seconds_nanoseconds()[0]),
-#                               nanosec=int(now.seconds_nanoseconds()[1]))
-        
-#         # 음식 주문 목록 생성
-#         for food_id, quantity in food_orders:
-#             food_order = FoodOrder()
-#             food_order.food_id = food_id
-#             food_order.quantity = quantity
-#             order.orders.append(food_order)
-            
-#         # 서비스 요청 생성
-#         request = OrderService.Request()
-#         request.order = order
-        
-#         # 비동기로 서비스 호출
-#         future = self.order_client.call_async(request)
-#         return future
-
-#     def cancel_order(self, order_id, table_id, reason="고객 요청"):
-#         """
-#         주문을 취소하는 메서드
-        
-#         Args:
-#             order_id (int): 취소할 주문 번호
-#             table_id (int): 테이블 번호
-#             reason (str): 취소 사유
-#         """
-#         cancel_msg = CancelOrder()
-#         cancel_msg.order_id = order_id
-#         cancel_msg.table_id = table_id
-#         cancel_msg.reason = reason  # 취소 사유 추가
-        
-#         self.cancel_publisher.publish(cancel_msg)
-#         self.get_logger().info(
-#             f'주문 취소 요청을 보냈습니다: 주문번호 {order_id}, 테이블 {table_id}, 사유: {reason}'
-#         )
-
-# def main(args=None):
-#     rclpy.init(args=args)
-#     client = RestaurantClient()
-    
-#     try:
-#         food_orders = [
-#             (1, 2),  # food_id 1: 2개
-#             (2, 1)   # food_id 2: 1개
-#         ]
-#         future = client.send_order(1, food_orders)
-        
-#         rclpy.spin_until_future_complete(client, future)
-        
-#         if future.result() is not None:
-#             response = future.result()
-#             client.get_logger().info(
-#                 f'주문 결과: {response.success}, '
-#                 f'주문번호: {response.order_id}, '
-#                 f'메시지: {response.message}'
-#             )
-            
-#             # 5초 후 주문 취소
-#             time.sleep(5)
-#             client.cancel_order(
-#                 response.order_id, 
-#                 1, 
-#                 "고객 변심"
-#             )
-            
-#             # 취소 메시지가 전송될 수 있도록 잠시 대기
-#             time.sleep(1)
-#         else:
-#             client.get_logger().error('서비스 호출 실패')
-            
-#     except KeyboardInterrupt:
-#         pass
-#     finally:
-#         client.destroy_node()
-#         rclpy.shutdown()
-
-# if __name__ == '__main__':
-#     main()
-
-
-
 #!/usr/bin/env python3
 import rclpy
 from rclpy.node import Node
@@ -296,6 +162,9 @@ class RestaurantClientGUI(QMainWindow):
             self.client_node.cancel_order(order_id, table_id, "고객 취소")
             self.order_table.item(current_row, 4).setText('취소됨')
 
+    def update_state(self, row=0):
+        self.order_table.setItem(4, QTableWidgetItem('서빙 완료'))
+
 class RestaurantClient(Node):
     def __init__(self):
         super().__init__('restaurant_client')
@@ -310,7 +179,7 @@ class RestaurantClient(Node):
         self.cancel_publisher = self.create_publisher(
             CancelOrder,
             'cancel_order',
-            10)
+            10) # 큐 크기
             
         while not self.order_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('서비스를 기다리는 중...')
