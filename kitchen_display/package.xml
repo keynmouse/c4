@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>kitchen_display</name>
+  <version>0.0.1</version>
+  <description>Kitchen display node for restaurant system</description>
+  <maintainer email="keynmouse@example.com">keynmouse</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_python</buildtool_depend>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+</package>
