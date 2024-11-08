@@ -1,26 +1,12 @@
 #!/usr/bin/env python3
 import rclpy
-from rclpy.node import Node
-from order_interfaces.msg import NewOrder, CancelOrder
-from order_interfaces.srv import OrderService
-from PyQt5.QtWidgets import QPushButton, QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWidgetItem, QMessageBox
-from PyQt5.QtCore import QTimer
-import sys
-import sqlite3
-from datetime import datetime
-from playsound import playsound
-import threading
-from collections import deque
-
-#!/usr/bin/env python3
-import rclpy
 import sys
 import sqlite3
 import threading
 import time
 import pygame
 from rclpy.node import Node
-from order_interfaces.msg import CancelOrder
+from order_interfaces.msg import NewOrder, CancelOrder
 from order_interfaces.srv import OrderService
 from PyQt5.QtWidgets import QPushButton, QApplication, QMainWindow, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QMessageBox
 from PyQt5.QtCore import QTimer
