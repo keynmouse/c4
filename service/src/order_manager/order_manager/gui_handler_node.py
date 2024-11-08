@@ -154,11 +154,12 @@ class RestaurantDisplay(QMainWindow):
         file_path = './resource/baedalyi-minjog.mp3'
 
         try:
-            thread = threading.Thread(
-                target=playsound, 
-                args=(file_path), 
-                daemon=True
-            )
+            # pygame 초기화
+            pygame.mixer.init()
+            pygame.mixer.music.load(file_path)
+            
+            # 소리 재생을 비동기적으로 실행
+            thread = threading.Thread(target=pygame.mixer.music.play, daemon=True)
             thread.start()
         except Exception as e:
             print(f"재생 오류: {e}")
