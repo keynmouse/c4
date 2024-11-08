@@ -134,11 +134,13 @@ class RestaurantDisplay(QMainWindow):
 
     # 서빙 버튼 클릭시 실행
     def button_clicked(self, table_id:int, row_position:int):
-        self.gui_node.position = self.gui_node.pose[table_id]
+        self.gui_node.position = self.gui_node.pose[table_id-1]
         self.gui_node.navigate_to_pose_send_goal()
+        self.order_table.setItem(row_position, 6, QTableWidgetItem(str("서빙중")))
+        self.gui_node.order_table = self.order_table
+        self.gui_node.row_position = row_position
 
-        self.order_table.setItem(row_position, 6, QTableWidgetItem(str("서빙완료")))
-
+    
         pass
 
         
@@ -405,7 +407,7 @@ class GuiNode(Node):
         self.set_yaw_goal_tolerance_client = self.create_client(SetParameters, "/controller_server/set_parameters")
 
         # Init
-        self.set_yaw_goal_tolerance("general_goal_checker.yaw_goal_tolerance", 7.0)
+        self.set_yaw_goal_tolerance("general_goal_checker.yaw_goal_tolerance", 90.0)
         self.position = [0.0, 0.0]
         
         # create Service Clinet
@@ -425,6 +427,9 @@ class GuiNode(Node):
                     (0.4, 1.6),     # 6
                     (0.4, 0.5),     # 7
                     (0.4, -0.6)]    # 8
+        
+        self.order_table = None
+        self.row_position = None
 
 
     # Service client SET INIT POSE ESTIMATE
@@ -495,8 +500,13 @@ class GuiNode(Node):
         self.send_goal_future = self.navigate_to_pose_action_client.send_goal_async(
             goal_msg,
             feedback_callback=self.navigate_to_pose_action_feedback)
-
+        self.action_result_future.add_done_callback(lambda _ : self.update_state())
         return True
+    
+    # 서빙 버튼 정보 업데이트
+    def update_state(self):
+        self.order_table.setItem(self.row_position, 6, QTableWidgetItem(str("서빙완료")))
+
 
     def navigate_to_pose_action_goal(self, future):
         goal_handle = future.result()
@@ -511,8 +521,6 @@ class GuiNode(Node):
         self.action_result_future = goal_handle.get_result_async()
         self.action_result_future.add_done_callback(self.navigate_to_pose_action_result)
         self.action_result_future.add_done_callback(lambda _ : self.navigate_to_pose_go_init())
-
-        
 
 
 
@@ -560,6 +568,7 @@ class GuiNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
+    # Robot Control 
     gui_node = GuiNode()
     
     # pyqt5
@@ -570,9 +579,7 @@ def main(args=None):
     # DB
     restaurant_DB = RestaurantDatabase()
     
-    # Robot Control 
     
-
     restaurant_server = RestaurantServer(qt_display, restaurant_DB)
 
     
