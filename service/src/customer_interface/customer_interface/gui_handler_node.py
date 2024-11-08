@@ -8,10 +8,13 @@ from builtin_interfaces.msg import Time
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                            QHBoxLayout, QLabel, QPushButton, QSpinBox, 
                            QTableWidget, QTableWidgetItem, QMessageBox)
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, Qt
+from PyQt5.QtGui import QPixmap
 import sys
 import datetime
 import time
+
+import os
 
 class RestaurantClientGUI(QMainWindow):
     def __init__(self, client_node):
@@ -34,10 +37,10 @@ class RestaurantClientGUI(QMainWindow):
 
         # 메뉴 항목들
         self.menu_items = {
-            1: {"name": "피자", "price": 15000},
-            2: {"name": "파스타", "price": 12000},
-            3: {"name": "샐러드", "price": 8000},
-            4: {"name": "음료", "price": 2000}
+            1: {"name": "피자", "price": 15000, "path": "./resource/pizza.jpeg"},
+            2: {"name": "파스타", "price": 12000, "path": "./resource/pasta.jpeg"},
+            3: {"name": "샐러드", "price": 8000, "path": "./resource/salad.jpeg"},
+            4: {"name": "음료", "price": 2000, "path": "./resource/beverage.jpeg"},
         }
 
         # 각 메뉴에 대한 스피너 생성
@@ -45,7 +48,17 @@ class RestaurantClientGUI(QMainWindow):
         for food_id, item in self.menu_items.items():
             menu_item = QWidget()
             item_layout = QVBoxLayout(menu_item)
-            
+
+            # 메뉴 이미지
+            image_label = QLabel()
+            print(item['path'])
+            print(os.path.exists(item['path']))
+            pixmap = QPixmap(item['path'])
+            scaled_pixmap = pixmap.scaled(120, 120, Qt.AspectRatioMode.KeepAspectRatio)
+            image_label.setPixmap(scaled_pixmap)
+            image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            item_layout.addWidget(image_label)
+
             # 메뉴 이름과 가격
             item_label = QLabel(f"{item['name']}\n{item['price']}원")
             item_layout.addWidget(item_label)
@@ -65,7 +78,7 @@ class RestaurantClientGUI(QMainWindow):
         table_layout = QHBoxLayout(table_widget)
         table_label = QLabel('테이블 번호:')
         self.table_spinner = QSpinBox()
-        self.table_spinner.setRange(1, 10)
+        self.table_spinner.setRange(1, 9)
         table_layout.addWidget(table_label)
         table_layout.addWidget(self.table_spinner)
         table_layout.addStretch()
@@ -78,14 +91,14 @@ class RestaurantClientGUI(QMainWindow):
 
         # 주문 현황 테이블
         self.order_table = QTableWidget()
-        self.order_table.setColumnCount(5)
-        self.order_table.setHorizontalHeaderLabels(['주문번호', '테이블', '메뉴', '수량', '상태'])
+        self.order_table.setColumnCount(4)
+        self.order_table.setHorizontalHeaderLabels(['주문번호', '테이블', '메뉴', '수량'])
         layout.addWidget(self.order_table)
 
         # 선택된 주문 취소 버튼
-        cancel_btn = QPushButton('선택 주문 취소')
-        cancel_btn.clicked.connect(self.cancel_selected_order)
-        layout.addWidget(cancel_btn)
+        # cancel_btn = QPushButton('선택 주문 취소')
+        # cancel_btn.clicked.connect(self.cancel_selected_order)
+        # layout.addWidget(cancel_btn)
 
     def place_order(self):
         # 주문할 메뉴 수집
@@ -133,8 +146,7 @@ class RestaurantClientGUI(QMainWindow):
                     for food_id in self.spinners
                     if self.spinners[food_id].value() > 0
                 ))))
-                self.order_table.setItem(row, 4, QTableWidgetItem('처리중'))
-                
+                # self.order_table.setItem(row, 4, QTableWidgetItem('처리중'))
                 # 스피너 초기화
                 for spinner in self.spinners.values():
                     spinner.setValue(0)
@@ -160,7 +172,7 @@ class RestaurantClientGUI(QMainWindow):
         
         if reply == QMessageBox.Yes:
             self.client_node.cancel_order(order_id, table_id, "고객 취소")
-            self.order_table.item(current_row, 4).setText('취소됨')
+            # self.order_table.item(current_row, 4).setText('취소됨')
 
     def update_state(self, row=0):
         self.order_table.setItem(4, QTableWidgetItem('서빙 완료'))

@@ -12,24 +12,25 @@ from playsound import playsound
 import threading
 from collections import deque
 
-# gui
-import sys
+#!/usr/bin/env python3
 import rclpy
+import sys
+import sqlite3
 import threading
 import time
+import pygame
 from rclpy.node import Node
+from order_interfaces.msg import CancelOrder
+from order_interfaces.srv import OrderService
+from PyQt5.QtWidgets import QPushButton, QApplication, QMainWindow, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QMessageBox
+from PyQt5.QtCore import QTimer
+from datetime import datetime
+from collections import deque
 from rcl_interfaces.srv import SetParameters
 from rcl_interfaces.msg import Parameter, ParameterType, ParameterValue
-
-from PyQt5.QtWidgets import QApplication,QGridLayout,  QMainWindow, QTextEdit, QWidget, QVBoxLayout, QPushButton, QLabel, QLineEdit
-from PyQt5.QtCore import QTimer, pyqtSignal, QObject, pyqtSignal
-
-from std_msgs.msg import String
 from rclpy.action import ActionClient
 from nav2_msgs.action import NavigateToPose
 from rclpy.action.client import GoalStatus
-from geometry_msgs.msg import PointStamped
-
 from nav2_msgs.srv import SetInitialPose
 from geometry_msgs.msg import Point, Quaternion
 
@@ -101,43 +102,6 @@ class RestaurantServer(Node):
         else:
             self.get_logger().warn(f'Order {order_id} not found for cancellation')
 
-
-# class QueueManager():
-#     def __init__(self):
-#         self.deque = deque()
-#         self.is_idle = True
-#         self.is_running = False
-#         self._worker_task = None
-    
-#     def add_queue(self, func: Callable, *args, **kwargs):
-#         self.deque.append((func, args, kwargs))
-
-#     async def start(self):
-#         if not self.is_running:
-#             self.is_running = True
-#             self._worker_task = asyncio.create_task(self._worker())
-
-#     async def action_worker(self):
-#         while self.deque:
-#             if self.is_idle:
-#                 self.is_idle = False
-#                 func, args, kwargs = self.deque.popleft()
-#                 try:
-#                     if asyncio.iscoroutinefunction(func):
-#                         await func(*args, **kwargs)
-#                     else:
-#                         func(*args, **kwargs)
-#                 except Exception as e:
-#                     print(f"Error executing function: {e}")
-#         self.is_running = False
-#         self.__del__()
-
-
-#     async def stop(self):
-#         self.is_running = False
-#         if self.action_worker:
-#             await self.action_worker 
-
     
 
 class RestaurantDisplay(QMainWindow):
@@ -146,6 +110,14 @@ class RestaurantDisplay(QMainWindow):
         self.setWindowTitle('주방 디스플레이')
         self.setGeometry(100, 100, 800, 600)
         self.gui_node = gui_node
+
+        self.menu_name = {
+            1: "피자",
+            2: "파스타",
+            3: "샐러드",
+            4: "음료",
+        }
+
 
         # 메인 위젯과 레이아웃
         main_widget = QWidget()
@@ -165,37 +137,22 @@ class RestaurantDisplay(QMainWindow):
             self.order_table.insertRow(row_position)
             self.order_table.setItem(row_position, 0, QTableWidgetItem(str(order.order_id)))
             self.order_table.setItem(row_position, 1, QTableWidgetItem(str(order.table_id)))
-            self.order_table.setItem(row_position, 2, QTableWidgetItem(str(food_order.food_id)))
+            self.order_table.setItem(row_position, 2, QTableWidgetItem(str(self.menu_name[food_order.food_id])))
             self.order_table.setItem(row_position, 3, QTableWidgetItem(str(food_order.quantity)))
             self.order_table.setItem(row_position, 4, QTableWidgetItem(str(timestamp)))
             # 버튼 추가
             button = QPushButton("서빙")
-            button.clicked.connect(lambda checked, r=row_position: self.button_clicked(int(self.order_table.item(r, 1).text())))
+            button.clicked.connect(lambda checked, r=row_position: self.button_clicked(int(self.order_table.item(r, 1).text()), r))
             self.order_table.setCellWidget(row_position, 5, button)
             self.order_table.setItem(row_position, 6, QTableWidgetItem(str("조리중")))
 
-    # 서빙 버튼 클릭시 실행 메소드
-    def button_clicked(self, table_id:int):
-        # QM = QueueManager()
-        # print(table_id)
-        # # QM.add_queue(self.gui_node.navigate_to_pose_send_goal())
-        # # # self.gui_node.position = (0.0, 0.0)
-        # # # await self.gui_node.navigate_to_pose_send_goal()
-        # # QM.add_queue(self.gui_node.navigate_to_pose_go_init())
-        # self.gui_node.position = self.gui_node.pose[table_id]
-        # self.gui_node.send_goal_and_wait_async()
+    # 서빙 버튼 클릭시 실행
+    def button_clicked(self, table_id:int, row_position:int):
         self.gui_node.position = self.gui_node.pose[table_id]
         self.gui_node.navigate_to_pose_send_goal()
-        # self.gui_node.send_goal_and_wait_async()
 
-        # self.gui_node.add_queue(self.gui_node.pose[table_id])
-        # self.gui_node.add_queue((0.0, 0.0))
-        # self.gui_node.pop_queue()
-        # self.gui_node.pop_queue()
-    
-        # QM.start()
+        self.order_table.setItem(row_position, 6, QTableWidgetItem(str("서빙완료")))
 
-        # 서빙 완료
         pass
 
         
@@ -422,14 +379,14 @@ class RestaurantDatabase():
         try:
             cursor = self.connection.cursor()
             cursor.execute(f'''
-SELECT SUM(oi.quantity * mi.price) as total_amount
-FROM ORDER_ITEM oi
-JOIN MENU_ITEM mi ON oi.menu_item_id = mi.menu_item_id
-WHERE oi.order_id = {order_id};
+            SELECT SUM(oi.quantity * mi.price) as total_amount
+            FROM ORDER_ITEM oi
+            JOIN MENU_ITEM mi ON oi.menu_item_id = mi.menu_item_id
+            WHERE oi.order_id = {order_id};
             ''')
             return cursor.fetchone()[0]
         except sqlite3.Error as e:
-            print(f"주문번호 {order_id}의 매출 구하기 실패: {e}")
+            print(f"주문번호 {order_id}의 총액 구하기 실패: {e}")
             self.connection.rollback()
             return None
 
@@ -453,12 +410,7 @@ class GuiNode(Node):
     """ROS2 노드 클래스"""
     def __init__(self):
         super().__init__("gui_node")
-        self.queue = deque()
-        self.is_running = False
-        '''
-        # Subscriber 생성
-        self.clicked_point_subscriber = self.create_subscription(PointStamped,"point_stamped_topic",self.clicked_point_callback,10)
-        '''
+
         # Action Client 생성
         self.navigate_to_pose_action_client = ActionClient(self, NavigateToPose, "navigate_to_pose")
 
@@ -475,7 +427,7 @@ class GuiNode(Node):
         
         while not self.set_initial_pose_service_client.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Service /set_initial_pose not available, waiting again...')
-        print(self.init_pose)
+
         self.set_initial_pose(*self.init_pose)
         self.pose = [(2.6, 1.6),    # 0
                     (2.6, 0.5),     # 1
@@ -487,40 +439,6 @@ class GuiNode(Node):
                     (0.4, 0.5),     # 7
                     (0.4, -0.6)]    # 8
 
-    '''
-    # TOPIC SUBSCRIBER GOAL SETTING
-    def clicked_point_callback(self, msg):
-
-        if self.GUI.setting_position:
-
-            self.position[0] = round(float(msg.point.x),1)
-            self.position[1] = round(float(msg.point.y),1)
-
-            message = f"[COMPLETE] Goal is {self.position[0]}, {self.position[1]}"
-            print(message)
-
-            name = f"Move to {self.position[0]}, {self.position[1]}"
-            self.GUI.change_button_name(name)
-
-            self.GUI.setting_position = False
-    '''
-    # 서빙 대기열
-    def add_queue(self, pos):
-        self.queue.append(pos)
-
-
-    def pop_queue(self):
-        while self.is_running:
-            # print("waiting")
-            print(self.position)
-            pass
-        self.is_running = True
-        self.position = self.queue.popleft()
-        if self.position == (0.0 ,0.0):
-            self.navigate_to_pose_go_init()
-        else:
-            self.navigate_to_pose_send_goal()
-        
 
     # Service client SET INIT POSE ESTIMATE
     def set_initial_pose(self, x,y,z,w):
@@ -538,43 +456,6 @@ class GuiNode(Node):
         future = self.set_initial_pose_service_client.call_async(req)
         
         return future.result()
-
-    async def send_goal_and_wait_async(self):
-        # 서버가 사용 가능할 때까지 대기
-        self.action_client.wait_for_server()
-
-        goal_msg = NavigateToPose.Goal()
-        goal_msg.pose.header.frame_id = "map"
-        goal_msg.pose.pose.position.x = self.position[0]
-        goal_msg.pose.pose.position.y = self.position[1]
-        goal_msg.pose.pose.position.z = 0.0
-        goal_msg.pose.pose.orientation.x = 0.0
-        goal_msg.pose.pose.orientation.y = 0.0
-        goal_msg.pose.pose.orientation.z = 0.0
-        goal_msg.pose.pose.orientation.w = 1.0
-        
-        
-        # 목표 전송
-        send_goal_future = await self.action_client.send_goal_async(goal_msg)
-        goal_handle = await send_goal_future
-        
-        if not goal_handle.accepted:
-            self.get_logger().error('Goal rejected')
-            return False
-            
-        # 결과를 기다림
-        get_result_future = await goal_handle.get_result_async()
-        status = get_result_future.status
-        result = get_result_future.result
-        
-        if status == GoalStatus.STATUS_SUCCEEDED:
-            self.get_logger().info('Goal succeeded!')
-            return True
-        else:
-            self.get_logger().error(f'Goal failed with status: {status}')
-            return False
-
-
         
     ## ACTION CLIENT NAVIGATE      
     def navigate_to_pose_send_goal(self):
@@ -605,6 +486,7 @@ class GuiNode(Node):
         return True
     
     def navigate_to_pose_go_init(self):
+        time.sleep(4)
         wait_count = 1
         while not self.navigate_to_pose_action_client.wait_for_server(timeout_sec=0.1):
             if wait_count > 3:
@@ -622,16 +504,11 @@ class GuiNode(Node):
         goal_msg.pose.pose.orientation.y = 0.0
         goal_msg.pose.pose.orientation.z = 0.0
         goal_msg.pose.pose.orientation.w = 1.0
-        # self.position[0]=0.0
-        # self.position[1]=0.0
         
         self.send_goal_future = self.navigate_to_pose_action_client.send_goal_async(
             goal_msg,
             feedback_callback=self.navigate_to_pose_action_feedback)
-        # flag
-        self.is_running = False
-        self.send_goal_future.add_done_callback(self.navigate_to_pose_action_goal)
-        
+
         return True
 
     def navigate_to_pose_action_goal(self, future):
@@ -645,9 +522,6 @@ class GuiNode(Node):
         print(message)
 
         self.action_result_future = goal_handle.get_result_async()
-        # flag
-        self.is_running = False
-        print("r")
         self.action_result_future.add_done_callback(self.navigate_to_pose_action_result)
         self.action_result_future.add_done_callback(lambda _ : self.navigate_to_pose_go_init())
 
@@ -665,11 +539,7 @@ class GuiNode(Node):
         if action_status == GoalStatus.STATUS_SUCCEEDED:
             message = "[INFO] Action succeeded!."
             print(message)
-            time.sleep(3)
-            # if self.position[0]!=0.0 and self.position[1]!=0.0:
-            #     print(self.position)
-            #     time.sleep(3)
-            #     self.navigate_to_pose_go_init()
+
         else:
             message = f"[WARN] Action failed with status: {action_status}"
             print(message)
