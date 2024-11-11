@@ -8,7 +8,7 @@ import pygame
 from rclpy.node import Node
 from order_interfaces.msg import NewOrder, CancelOrder
 from order_interfaces.srv import OrderService
-from PyQt5.QtWidgets import QPushButton, QApplication, QMainWindow, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QPushButton, QLabel, QApplication, QMainWindow, QWidget, QVBoxLayout, QTableWidget, QTableWidgetItem, QMessageBox
 from PyQt5.QtCore import QTimer
 from datetime import datetime
 from collections import deque
@@ -50,7 +50,7 @@ class RestaurantServer(Node):
         order.order_id = self.restaurant_DB.get_table_order()
         self.get_logger().info(f'Received order: {order.order_id} from table {order.table_id}')
         
-        seconds = order.order_time.sec + (order.order_time.nanosec / 1e9)
+        seconds = order.order_time.sec
         self.timestamp = datetime.fromtimestamp(seconds)
         # 주문 처리 로직
         self.orders[order.order_id] = order
@@ -91,11 +91,13 @@ class RestaurantServer(Node):
     
 
 class RestaurantDisplay(QMainWindow):
-    def __init__(self, gui_node):
+    def __init__(self, gui_node, restaurant_DB):
         super().__init__()
         self.setWindowTitle('주방 디스플레이')
         self.setGeometry(100, 100, 800, 600)
         self.gui_node = gui_node
+        self.restaurant_DB = restaurant_DB
+        self.sales_volume = 0
 
         self.menu_name = {
             1: "피자",
@@ -115,6 +117,12 @@ class RestaurantDisplay(QMainWindow):
         self.order_table.setColumnCount(7)
         self.order_table.setHorizontalHeaderLabels(['주문번호', '테이블', '메뉴', '수량', '주문시간', '서빙', '조리중/서빙완료'])
         layout.addWidget(self.order_table)
+
+        button = QPushButton("매출 확인")
+        button.clicked.connect(lambda checked: self.on_sales_button_click())
+        layout.addWidget(button)
+        self.sales_layout = QLabel(f" 총 매출: {self.sales_volume}")
+        layout.addWidget(self.sales_layout)
 
     def update_order_display(self, order, timestamp):
         """새 주문 추가 또는 기존 주문 업데이트"""
@@ -140,11 +148,14 @@ class RestaurantDisplay(QMainWindow):
         self.gui_node.order_table = self.order_table
         self.gui_node.row_position = row_position
 
+        self.update_order_status(table_id, "CLOSED")
+        
     
-        pass
-
-        
-        
+    def on_sales_button_click(self):
+        self.sales_volume = self.restaurant_DB.get_total_sales_volume()
+        self.sales_layout.setText(f" 총 매출: {self.sales_volume}")
+    
+    
     def remove_order(self, order_id):
         """주문 취소 시 테이블에서 해당 주문 제거"""
         for row in range(self.order_table.rowCount()):
@@ -362,6 +373,7 @@ class RestaurantDatabase():
         pass
 
     def get_today_sales_volume(self):
+
         pass
 
     def get_sales_volume(self, order_id):
@@ -568,16 +580,18 @@ class GuiNode(Node):
 def main(args=None):
     rclpy.init(args=args)
 
+    # DB
+    restaurant_DB = RestaurantDatabase()
+
     # Robot Control 
     gui_node = GuiNode()
     
     # pyqt5
     app = QApplication(sys.argv)
-    qt_display = RestaurantDisplay(gui_node)
+    qt_display = RestaurantDisplay(gui_node, restaurant_DB)
     qt_display.show()
 
-    # DB
-    restaurant_DB = RestaurantDatabase()
+   
     
     
     restaurant_server = RestaurantServer(qt_display, restaurant_DB)
