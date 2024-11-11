@@ -136,19 +136,21 @@ class RestaurantDisplay(QMainWindow):
             self.order_table.setItem(row_position, 4, QTableWidgetItem(str(timestamp)))
             # 버튼 추가
             button = QPushButton("서빙")
-            button.clicked.connect(lambda checked, r=row_position: self.button_clicked(int(self.order_table.item(r, 1).text()), r))
+            button.clicked.connect(lambda checked, r=row_position: self.button_clicked(int(self.order_table.item(r, 1).text()), 
+                                                                                       r, 
+                                                                                       int(order.order_id)))
             self.order_table.setCellWidget(row_position, 5, button)
             self.order_table.setItem(row_position, 6, QTableWidgetItem(str("조리중")))
 
     # 서빙 버튼 클릭시 실행
-    def button_clicked(self, table_id:int, row_position:int):
+    def button_clicked(self, table_id:int, row_position:int, order_id:int):
         self.gui_node.position = self.gui_node.pose[table_id-1]
         self.gui_node.navigate_to_pose_send_goal()
         self.order_table.setItem(row_position, 6, QTableWidgetItem(str("서빙중")))
         self.gui_node.order_table = self.order_table
         self.gui_node.row_position = row_position
 
-        self.update_order_status(table_id, "CLOSED")
+        self.restaurant_DB.update_order_status(order_id, "CLOSED")
         
     
     def on_sales_button_click(self):
@@ -357,11 +359,11 @@ class RestaurantDatabase():
     def update_order_status(self, order_id, status):
         try:
             cursor = self.connection.cursor()
-            cursor.execute(f'''
+            cursor.execute('''
             UPDATE "ORDER"
-            SET status={status},
-            WHERE order_id={order_id}
-            ''')
+            SET status=?
+            WHERE order_id=?
+            ''', (status, order_id))
             return None
         except sqlite3.Error as e:
             print(f"주문 상태 바꾸기 실패: {e}")
