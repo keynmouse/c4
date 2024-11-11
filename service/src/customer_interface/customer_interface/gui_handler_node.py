@@ -96,9 +96,9 @@ class RestaurantClientGUI(QMainWindow):
         layout.addWidget(self.order_table)
 
         # 선택된 주문 취소 버튼
-        # cancel_btn = QPushButton('선택 주문 취소')
-        # cancel_btn.clicked.connect(self.cancel_selected_order)
-        # layout.addWidget(cancel_btn)
+        cancel_btn = QPushButton('선택 주문 취소')
+        cancel_btn.clicked.connect(self.cancel_selected_order)
+        layout.addWidget(cancel_btn)
 
     def place_order(self):
         # 주문할 메뉴 수집
