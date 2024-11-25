@@ -1,0 +1,151 @@
+import rclpy
+import DR_init
+
+# Single robot configuration
+ROBOT_ID = "dsr01"
+ROBOT_MODEL = "m0609"
+VELOCITY, ACC = 50, 50
+
+DR_init.__dsr__id = ROBOT_ID
+DR_init.__dsr__model = ROBOT_MODEL
+
+ON, OFF = 1, 0
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = rclpy.create_node("cup", namespace=ROBOT_ID)
+
+    DR_init.__dsr__node = node
+
+    try:
+        from DSR_ROBOT2 import (
+            release_compliance_ctrl,
+            check_force_condition,
+            task_compliance_ctrl,
+            set_desired_force,
+            release_force,
+            set_tool,
+            set_tcp,
+            set_digital_output,
+            get_digital_input,
+            movej,
+            movel,
+            wait,
+            trans,
+            get_current_posx,
+            move_periodic,
+            check_position_condition,
+            DR_TOOL,
+            DR_BASE,
+            DR_FC_MOD_REL,
+            DR_AXIS_Z,
+            DR_MV_MOD_REL,
+            DR_MV_MOD_ABS,
+            parallel_axis  # 추가된 부분
+        )
+
+        from DR_common2 import posx, posj
+
+    except ImportError as e:
+        node.get_logger().error(f"Error importing DSR_ROBOT2: {e}")
+        rclpy.shutdown()
+        return
+
+    # Grip motion functions
+    def wait_digital_input(sig_num):
+        while not get_digital_input(sig_num):
+            wait(0.5)
+            node.get_logger().info("Wait for digital input")
+
+    def grip():
+        set_digital_output(2, OFF)
+        set_digital_output(1, ON)
+        wait_digital_input(1)
+
+    def ungrip():
+        set_digital_output(1, OFF)
+        set_digital_output(2, ON)
+        wait_digital_input(2)
+
+    # Define positions
+    place_pos = posx([402.558, -198.519, 222.642, 171.245, 179.717, 171.848])  # 컵 플레이스 위치
+    pick_pos = posx([424.75, 280.38, 204.14, 91.08, 90.00, 90.00])  # 컵 피킹 위치
+    # Pick and place function
+    def pick_and_place(pick_pos, place_pos):
+        # Move to hover position above pick location
+        delta = [0, 0, 30, 0, 0, 0]
+        start_hover = trans(pick_pos, delta, DR_BASE, DR_BASE)
+        movel(start_hover, vel=VELOCITY, acc=ACC, ref=DR_BASE)
+
+        # Start gripping
+        set_digital_output(2, OFF)
+        set_digital_output(1, ON)
+
+        # Force control to lower
+        task_compliance_ctrl(stx=[2000, 2000, 500, 3000, 3000, 3000])
+        fd = [0, 0, -10, 0, 0, 0]
+        fctrl_dir = [0, 0, 1, 0, 0, 0]
+        set_desired_force(fd, dir=fctrl_dir, mod=DR_FC_MOD_REL)
+        while True:
+            if check_force_condition(DR_AXIS_Z, min=3) == 0:
+                release_force()
+                break
+            wait(0.1)  # 추가적인 대기 시간
+
+        release_compliance_ctrl()
+
+        # before go to pick up place (status = ungrip)
+        movel([0, 0, 30, 0, 0, 0], vel=VELOCITY, acc=ACC, ref=DR_BASE, mod=DR_MV_MOD_REL)
+        ungrip()
+        wait(1)
+
+        # go to pick up place (status = grip)
+        movel([0, 0, -45, 0, 0, 0], vel=VELOCITY, acc=ACC, ref=DR_BASE, mod=DR_MV_MOD_REL)
+        grip()
+        wait(1)
+
+        # Move up after placing
+        movel([0, 0, 120, 0, 0, 0], vel=VELOCITY, acc=ACC, ref=DR_BASE, mod=DR_MV_MOD_REL)
+        delta = [0, 0, 120, 0, 0, 0]
+        end_hover = trans(place_pos, delta, DR_BASE, DR_BASE)
+        movel(end_hover, vel=VELOCITY, acc=ACC, ref=DR_BASE)
+
+    # Set tool and TCP
+    set_tool("Tool Weight_test_1")
+    set_tcp("GripperSA_v1_test1")
+
+    # Move to ready position
+    JReady = posj([0, 0, 90, 0, 90, 0])  # 시작 위치
+    movej(JReady, vel=VELOCITY, acc=ACC)
+    try:
+        while rclpy.ok():
+            # 1층 (3개)
+            base_pos = place_pos
+            for i in range(3):
+                cup_pos = posx([base_pos[0], base_pos[1] - 80*i, base_pos[2], base_pos[3], base_pos[4], base_pos[5]])
+                pick_and_place(pick_pos, cup_pos)
+                wait(1)
+            
+            # 2층 (2개) 
+            for i in range(2):
+                cup_pos = posx([base_pos[0], base_pos[1] - 40 - 80*i, base_pos[2] + 95, base_pos[3], base_pos[4], base_pos[5]])
+                pick_and_place(pick_pos, cup_pos)
+                wait(1)
+                
+            # 3층 (1개)
+            cup_pos = posx([base_pos[0], base_pos[1] - 80, base_pos[2] + 190, base_pos[3], base_pos[4], base_pos[5]])
+            pick_and_place(pick_pos, cup_pos)
+            wait(1)
+            
+            break  # 한 번 실행 후 종료
+
+    except KeyboardInterrupt:
+        node.get_logger().info("사용자에 의해 중단되었습니다")
+    finally:
+        # 마지막 위치로 이동 및 노드 종료
+        movej(JReady, vel=VELOCITY, acc=ACC)
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == "__main__":
+    main()
